@@ -299,9 +299,9 @@ export const ZenSandbox: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900/60 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 shadow-sm flex flex-col md:flex-row gap-8" id="sandbox-section">
+    <div className="bg-white dark:bg-slate-900/60 rounded-3xl border border-slate-100 dark:border-slate-800 p-4 md:p-8 shadow-sm flex flex-col md:flex-row gap-5 md:gap-8" id="sandbox-section">
       {/* Intro section */}
-      <div className="md:w-1/3 flex flex-col justify-between space-y-6">
+      <div className="md:w-1/3 flex flex-col justify-between space-y-4 md:space-y-6">
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-2xl">
@@ -319,27 +319,37 @@ export const ZenSandbox: React.FC = () => {
             <label className="block text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
               选择绘画意境
             </label>
-            {SANDBOX_MODES.map((mode) => (
-              <button
-                key={mode.id}
-                onClick={() => {
-                  setActiveMode(mode.id);
-                  particlesRef.current = []; // swap modes clean particles
-                }}
-                className={`w-full text-left p-3.5 rounded-2xl border transition focus:outline-none cursor-pointer ${
-                  activeMode === mode.id
-                    ? "bg-slate-50 border-slate-200 dark:bg-slate-850 dark:border-slate-800 text-slate-800 dark:text-slate-100 font-medium"
-                    : "bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/20"
-                }`}
-              >
-                <div className="text-sm font-semibold tracking-wide" style={{ color: activeMode === mode.id ? mode.color : undefined }}>
-                  {mode.name}
-                </div>
-                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 leading-relaxed">
-                  {mode.description}
-                </p>
-              </button>
-            ))}
+            <div className="flex md:flex-col gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none flex-nowrap">
+              {SANDBOX_MODES.map((mode) => (
+                <button
+                  key={mode.id}
+                  onClick={() => {
+                    setActiveMode(mode.id);
+                    particlesRef.current = []; // swap modes clean particles
+                  }}
+                  className={`flex-shrink-0 md:w-full text-left p-2.5 md:p-3.5 rounded-2xl border transition focus:outline-none cursor-pointer ${
+                    activeMode === mode.id
+                      ? "bg-slate-50 border-slate-200 dark:bg-slate-850 dark:border-slate-800 text-slate-800 dark:text-slate-100 font-medium"
+                      : "bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/20"
+                  }`}
+                >
+                  <div className="text-xs md:text-sm font-semibold tracking-wide flex items-center gap-1.5" style={{ color: activeMode === mode.id ? mode.color : undefined }}>
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: mode.color }} />
+                    {mode.name}
+                  </div>
+                  <p className="hidden md:block text-[10px] text-slate-400 dark:text-slate-500 mt-1 leading-relaxed">
+                    {mode.description}
+                  </p>
+                </button>
+              ))}
+            </div>
+
+            {/* Dynamic Active Description on mobile */}
+            <div className="block md:hidden bg-slate-50/50 dark:bg-slate-850/40 p-2.5 rounded-2xl border border-slate-150/50 dark:border-slate-800/60">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                {SANDBOX_MODES.find(m => m.id === activeMode)?.description}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -388,7 +398,7 @@ export const ZenSandbox: React.FC = () => {
 
         <div
           ref={containerRef}
-          className="flex-1 h-[360px] md:h-[420px] rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800/50 shadow-inner relative select-none cursor-crosshair bg-slate-950"
+          className="flex-1 h-[280px] sm:h-[360px] md:h-[420px] rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800/50 shadow-inner relative select-none cursor-crosshair bg-slate-950"
         >
           <canvas
             ref={canvasRef}

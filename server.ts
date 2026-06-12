@@ -24,7 +24,7 @@ async function startServer() {
 
       if (!process.env.GEMINI_API_KEY) {
         return res.status(400).json({
-          error: "服务器未检测到 GEMINI_API_KEY。请在 Settings > Secrets 面板中配置您的密钥。",
+          error: "服务器未检测到 GEMINI_API_KEY。\n1. 若您在 AI Studio 预览环境，请点击右上角的 Settings > Secrets 并添加您的 API Key。\n2. 若您已将此应用部署至外部主机平台（例如 Render, Vercel 等），请登录您的平台控制台（如 dashboard.render.com），在 Service 的 [Environment] 标签页中，新增一个键名为 GEMINI_API_KEY 的环境变量，并填入您的密钥值。",
           isKeyMissing: true,
         });
       }

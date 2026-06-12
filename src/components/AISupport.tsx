@@ -319,13 +319,13 @@ export const AISupport: React.FC = () => {
                 </div>
               </div>
             ) : errorMessage ? (
-              <div className="rounded-2xl border border-rose-100 bg-rose-50/50 dark:border-rose-950/25 dark:bg-rose-950/5 p-4 flex gap-3 text-xs text-rose-600 dark:text-rose-400 leading-relaxed">
-                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <div className="rounded-2xl border border-rose-200 bg-rose-50/60 dark:border-rose-950/30 dark:bg-rose-950/5 p-4 flex gap-3 text-xs text-rose-600 dark:text-rose-400 leading-relaxed">
+                <AlertCircle className="w-4.5 h-4.5 flex-shrink-0 text-rose-500 mt-0.5" />
                 <div>
-                  <p className="font-semibold mb-1">接口响应出错：</p>
-                  <p className="text-[11px] mb-2">{errorMessage}</p>
-                  <p className="text-[10px] text-slate-400">
-                    请在右上角 Settings &gt; Secrets 面板中检查是否定义了有效的 <b>GEMINI_API_KEY</b>。
+                  <p className="font-semibold mb-1.5 text-rose-700 dark:text-rose-350">接口连接温馨提示：</p>
+                  <p className="text-[11px] whitespace-pre-line text-slate-650 dark:text-slate-300 leading-relaxed mb-2">{errorMessage}</p>
+                  <p className="text-[10px] text-slate-400 hover:text-slate-500 transition">
+                    如需申请免费的官方 Google AI/Gemini 密钥，可前往官方 Google AI Studio (aistudio.google.com) 免费申请。
                   </p>
                 </div>
               </div>
