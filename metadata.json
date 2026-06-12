@@ -1,0 +1,8 @@
+{
+  "name": "Remix: MindEase",
+  "description": "Evaluate your mental health and achieve peace with self-assessment tools and guided relaxation exercises.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
