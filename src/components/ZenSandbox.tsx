@@ -143,6 +143,39 @@ export const ZenSandbox: React.FC = () => {
     };
   }, [activeMode]);
 
+  // Hook touch event listeners directly to the DOM element with { passive: false }
+  // to prevent mobile page scrolling/jittering during drawing.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.cancelable) e.preventDefault();
+      handleStart(e);
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.cancelable) e.preventDefault();
+      handleMove(e);
+    };
+
+    const onTouchEnd = () => {
+      handleStop();
+    };
+
+    canvas.addEventListener("touchstart", onTouchStart, { passive: false });
+    canvas.addEventListener("touchmove", onTouchMove, { passive: false });
+    canvas.addEventListener("touchend", onTouchEnd, { passive: false });
+    canvas.addEventListener("touchcancel", onTouchEnd, { passive: false });
+
+    return () => {
+      canvas.removeEventListener("touchstart", onTouchStart);
+      canvas.removeEventListener("touchmove", onTouchMove);
+      canvas.removeEventListener("touchend", onTouchEnd);
+      canvas.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [activeMode]);
+
   const addParticlesFromMove = (x: number, y: number) => {
     const pCount = activeMode === "cosmos" ? 5 : activeMode === "water" ? 1 : 2;
     const particles = particlesRef.current;
@@ -197,9 +230,16 @@ export const ZenSandbox: React.FC = () => {
     const rect = canvas.getBoundingClientRect();
     let clientX, clientY;
 
-    if (e.touches && e.touches.length > 0) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
+    // Robust touch coordinate handling for mobile devices across platforms (Android/iOS)
+    const touches = e.touches || (e.nativeEvent && e.nativeEvent.touches);
+    const changedTouches = e.changedTouches || (e.nativeEvent && e.nativeEvent.changedTouches);
+
+    if (touches && touches.length > 0) {
+      clientX = touches[0].clientX;
+      clientY = touches[0].clientY;
+    } else if (changedTouches && changedTouches.length > 0) {
+      clientX = changedTouches[0].clientX;
+      clientY = changedTouches[0].clientY;
     } else if (e.clientX !== undefined) {
       clientX = e.clientX;
       clientY = e.clientY;
@@ -332,9 +372,6 @@ export const ZenSandbox: React.FC = () => {
             onMouseMove={handleMove}
             onMouseUp={handleStop}
             onMouseLeave={handleStop}
-            onTouchStart={handleStart}
-            onTouchMove={handleMove}
-            onTouchEnd={handleStop}
             className="w-full h-full block absolute inset-0 touch-none"
           />
         </div>
