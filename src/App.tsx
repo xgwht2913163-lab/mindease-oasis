@@ -78,7 +78,7 @@ export default function App() {
       {/* Top Ribbon Notice */}
       <div className="bg-emerald-600 text-emerald-50 dark:bg-emerald-950/60 dark:text-emerald-400 py-1.5 px-4 text-[11px] text-center font-medium border-b border-emerald-500/10 flex items-center justify-center gap-1.5 select-none">
         <Heart className="w-3.5 h-3.5 animate-pulse fill-current" />
-        <span>涛哥工作室出品 | 心境绿洲 • 心理自我关怀放松工坊 | 所有生理与心理数据均仅保存在您本地，保障隐私安全。</span>
+        <span>心境绿洲 • 心理自我关怀放松工坊 由涛哥工作室精雕细琢 | 所有生理与心理数据均仅保存在您本地，保障隐私安全。</span>
       </div>
 
       {/* Main Structural Body */}
@@ -89,10 +89,7 @@ export default function App() {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
               <span className="p-1 px-2.5 text-[10px] uppercase tracking-wider font-extrabold font-mono bg-emerald-500/10 rounded-full border border-emerald-500/10">
-                Oasis of Mind
-              </span>
-              <span className="p-1 px-2 text-[10px] font-bold bg-amber-500/10 text-amber-600 rounded-md border border-amber-500/10 dark:text-amber-400">
-                涛哥工作室
+                Oasis of Mind • 涛哥工作室
               </span>
               <span className="text-xs text-slate-400 font-mono italic">
                 {new Date().toLocaleDateString("zh-CN", { weekday: "long", year: "numeric", month: "short", day: "numeric" })}
@@ -231,7 +228,7 @@ export default function App() {
 
         {/* Footer info/notices */}
         <footer className="pt-8 border-t border-slate-100 dark:border-slate-800/60 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-slate-400">
-          <p>© 2026 心境绿洲 • 由 涛哥工作室 倾心呈现 • 基于科学测量量表及 procedural Web Audio 声音合成技术</p>
+          <p>© 2026 心境绿洲 • 涛哥工作室荣誉出品 • 基于科学测量量表及 procedural Web Audio 声音合成技术</p>
           <div className="flex items-center gap-2">
             <AlertCircle className="w-3.5 h-3.5" />
             <span>自评与 AI 建议不可作为医学替代，如严重不舒服请立即找医生获取指导！</span>

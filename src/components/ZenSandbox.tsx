@@ -42,12 +42,19 @@ interface Particle {
 
 export const ZenSandbox: React.FC = () => {
   const [activeMode, setActiveMode] = useState<"sand" | "water" | "cosmos">("sand");
+  const [touchDrawEnabled, setTouchDrawEnabled] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const particlesRef = useRef<Particle[]>([]);
   const isDrawingRef = useRef<boolean>(false);
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
+  const touchDrawEnabledRef = useRef<boolean>(true);
+
+  // Keep ref synchronized to prevent any React closure stale state inside event listeners
+  useEffect(() => {
+    touchDrawEnabledRef.current = touchDrawEnabled;
+  }, [touchDrawEnabled]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -137,42 +144,100 @@ export const ZenSandbox: React.FC = () => {
 
     tick();
 
+    // Event handlers inside useEffect to catch passive changes and avoid state stales
+    const getCoordsNative = (e: MouseEvent | TouchEvent): { x: number; y: number } | null => {
+      const rect = canvas.getBoundingClientRect();
+      let clientX = 0, clientY = 0;
+
+      if (window.TouchEvent && e instanceof TouchEvent) {
+        if (e.touches && e.touches.length > 0) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        } else if (e.changedTouches && e.changedTouches.length > 0) {
+          clientX = e.changedTouches[0].clientX;
+          clientY = e.changedTouches[0].clientY;
+        } else {
+          return null;
+        }
+      } else {
+        clientX = (e as MouseEvent).clientX;
+        clientY = (e as MouseEvent).clientY;
+      }
+
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top,
+      };
+    };
+
+    const handleDown = (e: MouseEvent | TouchEvent) => {
+      const isTouchEvent = window.TouchEvent && e instanceof TouchEvent;
+      if (isTouchEvent && !touchDrawEnabledRef.current) {
+        return; // Allow page and backdrop to scroll smoothly
+      }
+      if (e.cancelable) e.preventDefault();
+      isDrawingRef.current = true;
+      const pos = getCoordsNative(e);
+      if (pos) {
+        lastPosRef.current = pos;
+        addParticlesFromMove(pos.x, pos.y);
+      }
+    };
+
+    const handleMove = (e: MouseEvent | TouchEvent) => {
+      const isTouchEvent = window.TouchEvent && e instanceof TouchEvent;
+      if (isTouchEvent && !touchDrawEnabledRef.current) {
+        return; // Allow page scroll
+      }
+      if (!isDrawingRef.current) return;
+      if (e.cancelable) e.preventDefault();
+
+      const pos = getCoordsNative(e);
+      if (pos && lastPosRef.current) {
+        const dx = pos.x - lastPosRef.current.x;
+        const dy = pos.y - lastPosRef.current.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const steps = Math.max(1, Math.floor(dist / 3));
+
+        for (let i = 0; i < steps; i++) {
+          const interX = lastPosRef.current.x + (dx / steps) * i;
+          const interY = lastPosRef.current.y + (dy / steps) * i;
+          addParticlesFromMove(interX, interY);
+        }
+
+        lastPosRef.current = pos;
+      }
+    };
+
+    const handleUp = () => {
+      isDrawingRef.current = false;
+      lastPosRef.current = null;
+    };
+
+    // Rigorously bind native listeners avoiding passive issues
+    canvas.addEventListener("mousedown", handleDown);
+    canvas.addEventListener("mousemove", handleMove);
+    canvas.addEventListener("mouseup", handleUp);
+    canvas.addEventListener("mouseleave", handleUp);
+
+    canvas.addEventListener("touchstart", handleDown, { passive: false });
+    canvas.addEventListener("touchmove", handleMove, { passive: false });
+    canvas.addEventListener("touchend", handleUp, { passive: false });
+    canvas.addEventListener("touchcancel", handleUp, { passive: false });
+
     return () => {
       resizeObserver.disconnect();
       cancelAnimationFrame(animationId);
-    };
-  }, [activeMode]);
 
-  // Hook touch event listeners directly to the DOM element with { passive: false }
-  // to prevent mobile page scrolling/jittering during drawing.
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+      canvas.removeEventListener("mousedown", handleDown);
+      canvas.removeEventListener("mousemove", handleMove);
+      canvas.removeEventListener("mouseup", handleUp);
+      canvas.removeEventListener("mouseleave", handleUp);
 
-    const onTouchStart = (e: TouchEvent) => {
-      if (e.cancelable) e.preventDefault();
-      handleStart(e);
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      if (e.cancelable) e.preventDefault();
-      handleMove(e);
-    };
-
-    const onTouchEnd = () => {
-      handleStop();
-    };
-
-    canvas.addEventListener("touchstart", onTouchStart, { passive: false });
-    canvas.addEventListener("touchmove", onTouchMove, { passive: false });
-    canvas.addEventListener("touchend", onTouchEnd, { passive: false });
-    canvas.addEventListener("touchcancel", onTouchEnd, { passive: false });
-
-    return () => {
-      canvas.removeEventListener("touchstart", onTouchStart);
-      canvas.removeEventListener("touchmove", onTouchMove);
-      canvas.removeEventListener("touchend", onTouchEnd);
-      canvas.removeEventListener("touchcancel", onTouchEnd);
+      canvas.removeEventListener("touchstart", handleDown);
+      canvas.removeEventListener("touchmove", handleMove);
+      canvas.removeEventListener("touchend", handleUp);
+      canvas.removeEventListener("touchcancel", handleUp);
     };
   }, [activeMode]);
 
@@ -221,74 +286,6 @@ export const ZenSandbox: React.FC = () => {
         });
       }
     }
-  };
-
-  const getCoordinates = (e: any): { x: number; y: number } | null => {
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-
-    const rect = canvas.getBoundingClientRect();
-    let clientX, clientY;
-
-    // Robust touch coordinate handling for mobile devices across platforms (Android/iOS)
-    const touches = e.touches || (e.nativeEvent && e.nativeEvent.touches);
-    const changedTouches = e.changedTouches || (e.nativeEvent && e.nativeEvent.changedTouches);
-
-    if (touches && touches.length > 0) {
-      clientX = touches[0].clientX;
-      clientY = touches[0].clientY;
-    } else if (changedTouches && changedTouches.length > 0) {
-      clientX = changedTouches[0].clientX;
-      clientY = changedTouches[0].clientY;
-    } else if (e.clientX !== undefined) {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    } else {
-      return null;
-    }
-
-    return {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
-    };
-  };
-
-  const handleStart = (e: any) => {
-    // Prevent scrolling on mobile devices when touch drawing
-    if (e.cancelable) e.preventDefault();
-    isDrawingRef.current = true;
-    const pos = getCoordinates(e);
-    if (pos) {
-      lastPosRef.current = pos;
-      addParticlesFromMove(pos.x, pos.y);
-    }
-  };
-
-  const handleMove = (e: any) => {
-    if (!isDrawingRef.current) return;
-    if (e.cancelable) e.preventDefault();
-
-    const pos = getCoordinates(e);
-    if (pos && lastPosRef.current) {
-      // Interpolate lines between coordinates so rapid drag coordinates remain continuous
-      const dx = pos.x - lastPosRef.current.x;
-      const dy = pos.y - lastPosRef.current.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const steps = Math.max(1, Math.floor(dist / 3));
-
-      for (let i = 0; i < steps; i++) {
-        const interX = lastPosRef.current.x + (dx / steps) * i;
-        const interY = lastPosRef.current.y + (dy / steps) * i;
-        addParticlesFromMove(interX, interY);
-      }
-
-      lastPosRef.current = pos;
-    }
-  };
-
-  const handleStop = () => {
-    isDrawingRef.current = false;
-    lastPosRef.current = null;
   };
 
   const handleClear = () => {
@@ -357,9 +354,36 @@ export const ZenSandbox: React.FC = () => {
 
       {/* Canvas Drawing Sandbox */}
       <div className="flex-1 flex flex-col">
-        <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-2">
-          <Info className="w-3.5 h-3.5" />
-          <span>贴士：在右侧夜色中按住鼠标或者手指划动，轨迹随时间流逝会缓缓释怀淡出。</span>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
+          <div className="flex items-center gap-1.5 text-xs text-slate-400">
+            <Info className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+            <span className="hidden sm:inline">在沙盒夜色中鼠标拖拽/指尖划动即可手绘，缓慢释怀淡出。</span>
+            <span className="sm:hidden text-emerald-600 dark:text-emerald-450 font-medium">手机手势提示：可通过右侧按钮切换模式</span>
+          </div>
+
+          {/* Quick toggle to lock/unlock scroll */}
+          <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200/40 dark:border-slate-700/80 w-full sm:w-auto">
+            <button
+              onClick={() => setTouchDrawEnabled(true)}
+              className={`flex-1 sm:flex-none px-3 py-1 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
+                touchDrawEnabled
+                  ? "bg-slate-850 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xs"
+                  : "text-slate-500 hover:text-slate-700 dark:text-slate-400"
+              }`}
+            >
+              ✍️ 手机指尖绘画
+            </button>
+            <button
+              onClick={() => setTouchDrawEnabled(false)}
+              className={`flex-1 sm:flex-none px-3 py-1 text-[10px] font-semibold rounded-lg transition-all cursor-pointer ${
+                !touchDrawEnabled
+                  ? "bg-slate-850 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xs"
+                  : "text-slate-500 hover:text-slate-700 dark:text-slate-400"
+              }`}
+            >
+              📜 自由滑动页面
+            </button>
+          </div>
         </div>
 
         <div
@@ -368,10 +392,6 @@ export const ZenSandbox: React.FC = () => {
         >
           <canvas
             ref={canvasRef}
-            onMouseDown={handleStart}
-            onMouseMove={handleMove}
-            onMouseUp={handleStop}
-            onMouseLeave={handleStop}
             className="w-full h-full block absolute inset-0 touch-none"
           />
         </div>

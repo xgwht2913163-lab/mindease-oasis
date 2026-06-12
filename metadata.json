@@ -1,8 +1,6 @@
 {
-  "name": "Remix: MindEase",
-  "description": "Evaluate your mental health and achieve peace with self-assessment tools and guided relaxation exercises.",
+  "name": "心理健康自评与放松",
+  "description": "提供科学心理健康评估、AI暖心反馈指导、呼吸冥想舱、白噪音解压合成器与禅意沙画，助您舒缓身心压力，轻抚心灵褶皱。",
   "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -196,6 +196,30 @@ export const AISupport: React.FC = () => {
             AI 树洞辅导师将静静倾听，为您编织抚慰、鼓舞心灵的文字涟漪。
           </p>
 
+          {/* Quick preset venting prompts */}
+          <div className="space-y-2">
+            <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+              💡 快速导入心声模板
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "最近压力太大太闷了，脑子一刻也静不下来...",
+                "总觉得有些迷茫焦虑，什么事都提不起兴致...",
+                "沟通有些压抑局促，不知可以和谁吐露心声...",
+                "晚上躺在床上总会胡思乱想，陷入内耗失眠..."
+              ].map((txt) => (
+                <button
+                  key={txt}
+                  type="button"
+                  onClick={() => setVentText(txt)}
+                  className="px-2.5 py-1.5 text-[10px] text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-amber-400 bg-slate-50 hover:bg-indigo-50/60 dark:bg-slate-850 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800/80 rounded-xl transition cursor-pointer text-left focus:outline-none"
+                >
+                  {txt}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <form onSubmit={handleVentingSubmit} className="space-y-4 pt-2">
             <div className="relative">
               <textarea

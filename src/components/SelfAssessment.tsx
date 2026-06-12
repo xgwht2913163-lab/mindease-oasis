@@ -11,7 +11,7 @@ const PHQ9_SCALE: Questionnaire = {
   questions: [
     {
       id: 1,
-      text: "做事提不起劲或没有兴趣",
+      text: "做事时提不起劲或没有兴趣",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -21,7 +21,7 @@ const PHQ9_SCALE: Questionnaire = {
     },
     {
       id: 2,
-      text: "感到心情低落、沮丧或无望",
+      text: "情绪低落、沮丧、无望",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -31,7 +31,7 @@ const PHQ9_SCALE: Questionnaire = {
     },
     {
       id: 3,
-      text: "入睡困难、易醒，或睡得太多",
+      text: "入睡困难、易醒，或睡眠过多",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -41,7 +41,7 @@ const PHQ9_SCALE: Questionnaire = {
     },
     {
       id: 4,
-      text: "觉得疲倦或没有活力",
+      text: "觉得疲倦、没有活力",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -51,7 +51,7 @@ const PHQ9_SCALE: Questionnaire = {
     },
     {
       id: 5,
-      text: "胃口不好或吃得太多",
+      text: "胃口不好，或暴饮暴食",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -61,7 +61,7 @@ const PHQ9_SCALE: Questionnaire = {
     },
     {
       id: 6,
-      text: "觉得自己很糟、很失败，或让自己及家人失望",
+      text: "对自己不满意，觉得自己是个失败者，或者让家人失望",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -71,7 +71,7 @@ const PHQ9_SCALE: Questionnaire = {
     },
     {
       id: 7,
-      text: "对事物专注有困难，例如读报纸或看电视",
+      text: "注意力无法集中（例如阅读报纸或看电视时）",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -81,7 +81,7 @@ const PHQ9_SCALE: Questionnaire = {
     },
     {
       id: 8,
-      text: "行动或说话迟缓，甚至别人都已察觉；或者相反，烦躁不安、动来动去，甚至比平常严重",
+      text: "动作或说话迟缓到别人容易察觉；或者刚好相反：局促不安、坐立难安比平时多太多",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -91,7 +91,7 @@ const PHQ9_SCALE: Questionnaire = {
     },
     {
       id: 9,
-      text: "觉得活着没意思，或有伤害自己的念头",
+      text: "觉得活着没意思，或者有伤害自己的想法",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -160,7 +160,7 @@ const GAD7_SCALE: Questionnaire = {
     },
     {
       id: 3,
-      text: "对各种不同的事情担忧过多",
+      text: "对各种不同事情担忧过多",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -170,7 +170,7 @@ const GAD7_SCALE: Questionnaire = {
     },
     {
       id: 4,
-      text: "难以放松下来",
+      text: "很累而无法放松（无法克制地想问题或保持全身紧绷）",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -180,7 +180,7 @@ const GAD7_SCALE: Questionnaire = {
     },
     {
       id: 5,
-      text: "坐立不安，以致无法静坐",
+      text: "坐立不安，难以静卧/静坐",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
@@ -200,7 +200,7 @@ const GAD7_SCALE: Questionnaire = {
     },
     {
       id: 7,
-      text: "害怕会有可怕的事情发生",
+      text: "害怕会发生可怕的事情",
       options: [
         { text: "完全没有", score: 0 },
         { text: "有几天", score: 1 },
