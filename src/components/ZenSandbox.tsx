@@ -43,6 +43,7 @@ interface Particle {
 export const ZenSandbox: React.FC = () => {
   const [activeMode, setActiveMode] = useState<"sand" | "water" | "cosmos">("sand");
   const [touchDrawEnabled, setTouchDrawEnabled] = useState<boolean>(true);
+  const [hasDrawn, setHasDrawn] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -50,6 +51,7 @@ export const ZenSandbox: React.FC = () => {
   const isDrawingRef = useRef<boolean>(false);
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
   const touchDrawEnabledRef = useRef<boolean>(true);
+  const hasDrawnRef = useRef<boolean>(false);
 
   // Keep ref synchronized to prevent any React closure stale state inside event listeners
   useEffect(() => {
@@ -242,6 +244,10 @@ export const ZenSandbox: React.FC = () => {
   }, [activeMode]);
 
   const addParticlesFromMove = (x: number, y: number) => {
+    if (!hasDrawnRef.current) {
+      hasDrawnRef.current = true;
+      setHasDrawn(true);
+    }
     const pCount = activeMode === "cosmos" ? 5 : activeMode === "water" ? 1 : 2;
     const particles = particlesRef.current;
 
@@ -290,6 +296,8 @@ export const ZenSandbox: React.FC = () => {
 
   const handleClear = () => {
     particlesRef.current = [];
+    hasDrawnRef.current = false;
+    setHasDrawn(false);
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (canvas && ctx) {
@@ -319,7 +327,7 @@ export const ZenSandbox: React.FC = () => {
             <label className="block text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
               选择绘画意境
             </label>
-            <div className="flex md:flex-col gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none flex-nowrap">
+            <div className="grid grid-cols-3 md:flex md:flex-col gap-2 w-full pb-1 md:pb-0">
               {SANDBOX_MODES.map((mode) => (
                 <button
                   key={mode.id}
@@ -327,15 +335,16 @@ export const ZenSandbox: React.FC = () => {
                     setActiveMode(mode.id);
                     particlesRef.current = []; // swap modes clean particles
                   }}
-                  className={`flex-shrink-0 md:w-full text-left p-2.5 md:p-3.5 rounded-2xl border transition focus:outline-none cursor-pointer ${
+                  className={`text-center md:text-left p-2 md:p-3.5 rounded-xl md:rounded-2xl border transition focus:outline-none cursor-pointer ${
                     activeMode === mode.id
                       ? "bg-slate-50 border-slate-200 dark:bg-slate-850 dark:border-slate-800 text-slate-800 dark:text-slate-100 font-medium"
                       : "bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/20"
                   }`}
                 >
-                  <div className="text-xs md:text-sm font-semibold tracking-wide flex items-center gap-1.5" style={{ color: activeMode === mode.id ? mode.color : undefined }}>
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: mode.color }} />
-                    {mode.name}
+                  <div className="text-xs md:text-sm font-semibold tracking-wide flex items-center justify-center md:justify-start gap-1.5" style={{ color: activeMode === mode.id ? mode.color : undefined }}>
+                    <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: mode.color }} />
+                    <span className="md:hidden">{mode.name.split(" ")[0]}</span>
+                    <span className="hidden md:inline">{mode.name}</span>
                   </div>
                   <p className="hidden md:block text-[10px] text-slate-400 dark:text-slate-500 mt-1 leading-relaxed">
                     {mode.description}
@@ -398,12 +407,36 @@ export const ZenSandbox: React.FC = () => {
 
         <div
           ref={containerRef}
-          className="flex-1 h-[280px] sm:h-[360px] md:h-[420px] rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800/50 shadow-inner relative select-none cursor-crosshair bg-slate-950"
+          className="w-full h-[320px] sm:h-[380px] md:h-[450px] rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800/80 shadow-lg relative select-none cursor-crosshair bg-slate-950 ring-4 ring-slate-100/50 dark:ring-slate-950/10"
         >
           <canvas
             ref={canvasRef}
             className="w-full h-full block absolute inset-0 touch-none"
           />
+
+          {/* Floating interactive hint overlay so users know where to draw and how to act */}
+          {!hasDrawn && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center p-6 bg-slate-950/70 backdrop-blur-xs transition-opacity duration-500">
+              <div className="w-12 h-12 rounded-full bg-slate-900/90 border border-slate-800/80 flex items-center justify-center mb-3 animate-pulse text-emerald-400">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <p className="text-sm font-semibold text-slate-200 tracking-wide">
+                🎨 专属手绘解压沙区
+              </p>
+              <p className="text-xs text-slate-400 mt-1.5 max-w-xs leading-relaxed">
+                {touchDrawEnabled 
+                  ? "请用鼠标在此拖动，或滑动您的指尖，开始留下您的解压痕迹吧"
+                  : "当前为页面滚动模式。若要手绘，请点击上方的「手机指尖绘画」"
+                }
+              </p>
+              <div className="mt-4 flex items-center gap-1.5 px-3 py-1 bg-slate-900/90 border border-slate-800/80 rounded-full">
+                <span className={`w-1.5 h-1.5 rounded-full ${touchDrawEnabled ? "bg-emerald-500 animate-ping" : "bg-amber-500"}`} />
+                <span className="text-[10px] text-slate-400 font-mono">
+                  {touchDrawEnabled ? "指尖绘画：就绪" : "指尖功能：防误触已锁定"}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
