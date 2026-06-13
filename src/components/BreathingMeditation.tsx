@@ -118,7 +118,7 @@ export const BreathingMeditation: React.FC = () => {
     if (isActive) {
       setTimeLeft(currentPhase.duration);
     }
-  }, [currentPhaseIdx]);
+  }, [currentPhaseIdx, isActive]);
 
   // Reset function
   const handleReset = () => {
@@ -197,24 +197,29 @@ export const BreathingMeditation: React.FC = () => {
           </div>
         </div>
 
-        {/* Chime toggle & metadata */}
-        <div className="pt-4 border-t border-slate-50 dark:border-slate-800/50 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setAudioChimeEnabled(prev => !prev)}
-              className={`p-2 rounded-xl border transition-all cursor-pointer ${
-                audioChimeEnabled
-                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                  : "bg-slate-100/50 dark:bg-slate-800 border-slate-100 dark:border-slate-850 text-slate-400"
-              }`}
-            >
-              <Volume2 className="w-4 h-4" />
-            </button>
-            <span className="text-[10px] text-slate-400 font-medium">钟磬辅助提示音</span>
-          </div>
+        {/* Chime audio control station */}
+        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={() => setAudioChimeEnabled(prev => !prev)}
+                className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+                  audioChimeEnabled
+                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-650 dark:text-emerald-400"
+                    : "bg-slate-100/50 dark:bg-slate-800 border-slate-250 dark:border-slate-850 text-slate-400"
+                }`}
+                aria-label="切换钟磬提示音"
+              >
+                <Volume2 className="w-4.5 h-4.5" />
+              </button>
+              <span className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400">
+                磬磐律动音（循环过度提示）
+              </span>
+            </div>
 
-          <div className="text-[10px] text-slate-400 font-mono">
-            今日已完成: <span className="font-bold text-emerald-600 dark:text-emerald-400">{breathCount}</span> 轮
+            <div className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-850 px-2.5 py-1 rounded-lg">
+              今日呼息: <span className="font-bold text-emerald-650 dark:text-emerald-400">{breathCount}</span> 轮
+            </div>
           </div>
         </div>
       </div>
@@ -266,28 +271,28 @@ export const BreathingMeditation: React.FC = () => {
             }`}
           >
             {/* Center State content */}
-            <div className="text-center space-y-1 select-none">
-              <span className={`text-[10px] sm:text-xs uppercase font-semibold font-mono tracking-wider ${
+            <div className="text-center space-y-1.5 select-none">
+              <span className={`text-xs sm:text-sm uppercase font-bold tracking-wider ${
                 isActive ? getPhaseColor(currentPhase.name).split(" ")[0] : "text-slate-400"
               }`}>
-                {isActive ? getPhaseNameInChinese(currentPhase.name) : "准备就绪"}
+                {isActive ? getPhaseNameInChinese(currentPhase.name).split(" ")[0] : "准备就绪"}
               </span>
 
-              <div className="text-3xl font-black font-mono text-slate-800 dark:text-slate-100 h-10 flex items-center justify-center">
+              <div className="text-4xl font-extrabold font-mono text-slate-800 dark:text-slate-100 h-10 flex items-center justify-center">
                 {isActive ? timeLeft : "0"}
               </div>
 
-              <span className="text-[10px] text-slate-400 font-medium">
-                {isActive ? "秒" : "点击开始"}
+              <span className="text-xs text-slate-400 font-semibold">
+                {isActive ? "秒" : "点击下方开始"}
               </span>
             </div>
           </motion.div>
         </div>
 
         {/* Subtitle instructions */}
-        <div className="h-10 text-center max-w-sm mt-6 z-10">
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-350 italic transition-all">
-            {isActive ? currentPhase.instruction : "静坐，挺胸，全身放松，准备好了随时点击下方按钮"}
+        <div className="h-12 text-center max-w-sm mt-6 z-10 px-4">
+          <p className="text-sm sm:text-base text-slate-700 dark:text-slate-205 font-medium italic leading-relaxed transition-all">
+            {isActive ? currentPhase.instruction : "静坐，微闭双眼，全身放松，准备好后点击下方开始"}
           </p>
         </div>
 

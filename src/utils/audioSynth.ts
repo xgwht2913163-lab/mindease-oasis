@@ -44,8 +44,11 @@ class MentalAudioSynthesizer {
   }
 
   private updateChannelVolume(channel: "solfeggio" | "binaural" | "noise" | "bell") {
-    if (!this.ctx) return;
     const vol = this.volumes[channel];
+    if (vol > 0) {
+      this.initContext();
+    }
+    if (!this.ctx) return;
 
     // Solfeggio 528Hz Tone
     if (channel === "solfeggio") {
